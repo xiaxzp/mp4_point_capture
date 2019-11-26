@@ -21,6 +21,13 @@
     fieldset, img { border:0; } 
     button, input, select, textarea { font-size:100%; } 
     table { border-collapse:collapse; border-spacing:0; }
+    .color-block{
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+    }
+
   </style>
   <script src="/jquery"></script>
  
@@ -31,27 +38,27 @@
       style="position: fixed; right: 0; top: 0;"
     >
       <div>
-          <span id="colorblock1" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock1" class="color-block"></span>
           <span id="text1"></span>
       </div>
       <div>
-          <span id="colorblock2" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock2" class="color-block"></span>
           <span id="text2"></span>
       </div>
       <div>
-          <span id="colorblock3" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock3" class="color-block"></span>
           <span id="text3"></span>
       </div>
       <div>
-          <span id="colorblock4" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock4" class="color-block"></span>
           <span id="text4"></span>
       </div>
       <div>
-          <span id="colorblock5" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock5" class="color-block"></span>
           <span id="text5"></span>
       </div>
       <div>
-          <span id="colorblock6" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="colorblock6" class="color-block"></span>
           <span id="text6"></span>
       </div>
       <button id="clearBtn">clear</button>
@@ -71,6 +78,7 @@
       $(`#colorblock${i}`)[0].style.backgroundColor = `#fff`;
     }
   }
+  
   function renderCanvas () {
     $canva =$('#canva');
     $video = $("#main-video");
@@ -91,9 +99,12 @@
     });
     render();
     $('#clearBtn')[0].addEventListener('click', clear);
+    for(let i =1;i<7;i++){
+      $(`#colorblock${i}`)[0].addEventListener('click', (e) => remove(i));
+    }
     setInter = setInterval(r => {
       render();
-    }, 40)
+    }, 60)
 
     function render () {
       ctx.drawImage($video[0], 0, 0, $video.width(), $video.height());
@@ -107,6 +118,18 @@
         $(`#text${idx+1}`).text(px[idx] + ',' + py[idx] + ' | ' + myImageData.data.join(','));
         $(`#colorblock${idx+1}`)[0].style.backgroundColor = `rgba(${myImageData.data.join(',')})`;
       })
+    }
+    function remove(val){
+      console.log('clear', val);
+      px.splice(val-1, 1);
+      py.splice(val-1, 1);
+      for(let i =1;i<7;i++){
+        $(`#text${i}`).text('');
+        $(`#colorblock${i}`)[0].style.backgroundColor = `#fff`;
+      }
+      if(px.length){
+        updatePoint();
+      }
     }
     // 视频播放结束
     $video[0].addEventListener('ended', function () {

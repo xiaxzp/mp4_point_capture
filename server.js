@@ -15,7 +15,7 @@ app.get('/video', (req, res) => {
   res.end(video);
 })
 app.get('/jquery', (req, res) => {
-  const jquery = require('fs').readFileSync('../assets/js/jquery-3.4.1.min.js', 'utf-8');
+  const jquery = require('fs').readFileSync('./assets/js/jquery-3.4.1.min.js', 'utf-8');
   res.end(jquery);
 })
 app.listen(998, () => console.log('Example app listening on port 998!'))
