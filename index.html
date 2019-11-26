@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store" />
+  <style>
+    body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; } 
+    body, button, input, select, textarea { font:12px/1.5tahoma, arial, \5b8b\4f53; } 
+    h1, h2, h3, h4, h5, h6{ font-size:100%; } 
+    address, cite, dfn, em, var { font-style:normal; } 
+    code, kbd, pre, samp { font-family:couriernew, courier, monospace; } 
+    small{ font-size:12px; } 
+    ul, ol { list-style:none; } 
+    a { text-decoration:none; } 
+    a:hover { text-decoration:underline; } 
+    sup { vertical-align:text-top; } 
+    sub{ vertical-align:text-bottom; } 
+    legend { color:#000; } 
+    fieldset, img { border:0; } 
+    button, input, select, textarea { font-size:100%; } 
+    table { border-collapse:collapse; border-spacing:0; }
+  </style>
+  <script src="/jquery"></script>
+ 
+</head>
+<body>
+<div class="container">
+    <div
+      style="position: fixed; right: 0; top: 0;"
+    >
+      <div>
+          <span id="colorblock1" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text1"></span>
+      </div>
+      <div>
+          <span id="colorblock2" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text2"></span>
+      </div>
+      <div>
+          <span id="colorblock3" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text3"></span>
+      </div>
+      <div>
+          <span id="colorblock4" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text4"></span>
+      </div>
+      <div>
+          <span id="colorblock5" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text5"></span>
+      </div>
+      <div>
+          <span id="colorblock6" style="display: inline-block; width: 12px; height: 12px;"></span>
+          <span id="text6"></span>
+      </div>
+      <button id="clearBtn">clear</button>
+    </div>
+    <canvas id="canva"></canvas>
+    <video id="main-video" src="/video" controls>
+    </video>
+</div>
+<script>
+  let $canva, ctx, $video, setInter, px=[], py=[];
+  function clear(){
+    console.log('clear');
+    px=[];
+    py=[];
+    for(let i =1;i<7;i++){
+      $(`#text${i}`).text('');
+      $(`#colorblock${i}`)[0].style.backgroundColor = `#fff`;
+    }
+  }
+  function renderCanvas () {
+    $canva =$('#canva');
+    $video = $("#main-video");
+    ctx = $canva[0].getContext('2d');
+    console.log($video.width(),$video.height())
+    $canva[0].width = $video.width();
+    $canva[0].style.width = $video.width();
+    $canva[0].height = $video.height();
+    $canva[0].style.height = $video.height();
+    $video[0].play();
+    $canva[0].addEventListener('click', (e)=>{
+      if(px.length < 6){
+        px.push(e.pageX);
+        py.push(e.pageY);
+        updatePoint();
+      }
+      // $('#text')[0].style.color = `rgba(${revertColor(myImageData.data)})`;
+    });
+    render();
+    $('#clearBtn')[0].addEventListener('click', clear);
+    setInter = setInterval(r => {
+      render();
+    }, 40)
+
+    function render () {
+      ctx.drawImage($video[0], 0, 0, $video.width(), $video.height());
+      if(px.length){
+        updatePoint();
+      }
+    }
+    function updatePoint () {
+      px.forEach((item, idx) => {
+        let myImageData = ctx.getImageData(px[idx], py[idx], 1, 1);
+        $(`#text${idx+1}`).text(px[idx] + ',' + py[idx] + ' | ' + myImageData.data.join(','));
+        $(`#colorblock${idx+1}`)[0].style.backgroundColor = `rgba(${myImageData.data.join(',')})`;
+      })
+    }
+    // 视频播放结束
+    $video[0].addEventListener('ended', function () {
+      clearInterval(setInter);
+    });
+
+    // 视频被暂停
+    $video[0].addEventListener('pause', function () {
+      clearInterval(setInter);
+    });
+  }
+  $(($)=>{
+    setTimeout(()=>{
+      renderCanvas();
+    }, 1000)
+  })
+  function revertColor(arr){
+    return [255-arr[0], 255-arr[1], 255-arr[2], 255].join(',');
+  }
+</script>
+</body>
+</html>
+　　
