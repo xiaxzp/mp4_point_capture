@@ -67,16 +67,26 @@
       <button id="getPoints">get points</button>
     </div>
     <canvas id="canva"></canvas>
-    <video id="main-video" src="/video" controls>
+    <video id="main-video" src="/video.mp4" controls>
     </video>
 </div>
 <script>
   let $canva, ctx, $video, setInter, px=[], py=[];
+  const pointStatic = {
+    dataClear: {"x":468,"y":648,},
+
+  };
   const pointList = {
     okBtn: [{"x":431,"y":776,"pt":"45,196,180,255"},{"x":369,"y":798,"pt":"168,182,182,255"},{"x":338,"y":801,"pt":"216,255,255,255"},{"x":284,"y":788,"pt":"45,196,180,255"}],
     menuBtn: [{"x":672,"y":76,"pt":"244,248,248,255"},{"x":637,"y":71,"pt":"68,70,65,255"},{"x":659,"y":45,"pt":"77,72,69,255"},{"x":672,"y":29,"pt":"245,245,255,255"}],
-
-  }
+    menuCancel: [{"x":280,"y":833,"pt":"232,53,80,255"},{"x":454,"y":844,"pt":"232,53,80,255"},{"x":351,"y":906,"pt":"239,240,240,255"},{"x":458,"y":801,"pt":"247,249,247,255"}],
+    menuOkWithCancel: [{"x":443,"y":846,"pt":"232,53,80,255"},{"x":607,"y":832,"pt":"232,53,80,255"},{"x":298,"y":852,"pt":"254,255,254,255"},{"x":89,"y":840,"pt":"254,255,254,255"}],
+    trailCancel: [{"x":615,"y":823,"pt":"45,196,180,255"},{"x":405,"y":823,"pt":"45,196,180,255"},{"x":285,"y":823,"pt":"232,53,80,255"},{"x":110,"y":821,"pt":"232,53,80,255"}],
+    introHandle: [{"x":194,"y":1087,"pt":"200,38,35,255"},{"x":505,"y":1093,"pt":"200,38,35,255"},{"x":568,"y":1075,"pt":"110,11,2,255"},{"x":151,"y":1075,"pt":"110,11,2,255"}],
+    helpboxClose: [{"x":289,"y":1203,"pt":"45,196,180,255"},{"x":436,"y":1209,"pt":"45,196,180,255"},{"x":356,"y":1225,"pt":"45,196,180,255"},{"x":362,"y":1173,"pt":"45,196,180,255"}],
+    isPlaying: [{"x":168,"y":85,"pt":"132,213,46,255"},{"x":370,"y":85,"pt":"132,213,48,255"},{"x":588,"y":84,"pt":"132,213,48,255"},{"x":165,"y":75,"pt":"251,250,248,255"},{"x":369,"y":76,"pt":"255,255,255,255"},{"x":577,"y":75,"pt":"248,249,255,255"}],
+    
+  };
   function checkSth(ctxtar, pts, result, diff=16){
     // console.log('checking');
     const pass = pts.every( item => {
@@ -116,6 +126,7 @@
       ctx.drawImage($video[0], 0, 0, $video.width(), $video.height());
       checkSth(ctx, pointList.okBtn, 'ok found');
       checkSth(ctx, pointList.menuBtn, 'menu found');
+      checkSth(ctx, pointList.menuOkWithCancel, 'menuOkWithCancel found');
       if(px.length){
         updatePoint();
       }
@@ -196,7 +207,7 @@
   $(($)=>{
     document.querySelector('#main-video').addEventListener('canplay', () => {
       renderCanvas();
-    }) 
+    }, {once: true}); 
   })
   function revertColor(arr){
     return [255-arr[0], 255-arr[1], 255-arr[2], 255].join(',');

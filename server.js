@@ -10,10 +10,11 @@ app.get('/', (req, res) => {
   const page = require('fs').readFileSync('./index.html', 'utf-8');
   res.end(page);
 })
-app.get('/video', (req, res) => {
-  const video = require('fs').readFileSync('./video.mp4');
-  res.end(video);
-})
+app.use(express.static('./'));
+// app.get('/video', (req, res) => {
+//   const video = require('fs').readFileSync('./video.mp4');
+//   res.end(video);
+// })
 app.get('/jquery', (req, res) => {
   const jquery = require('fs').readFileSync('./assets/js/jquery-3.4.1.min.js', 'utf-8');
   res.end(jquery);
