@@ -62,6 +62,9 @@
           <span id="text6"></span>
       </div>
       <button id="clearBtn">clear</button>
+      <button id="playBtn">play</button>
+      <button id="stopBtn">stop</button>
+      <button id="getPoints">get points</button>
     </div>
     <canvas id="canva"></canvas>
     <video id="main-video" src="/video" controls>
@@ -69,6 +72,28 @@
 </div>
 <script>
   let $canva, ctx, $video, setInter, px=[], py=[];
+  const pointList = {
+    okBtn: [{"x":431,"y":776,"pt":"45,196,180,255"},{"x":369,"y":798,"pt":"168,182,182,255"},{"x":338,"y":801,"pt":"216,255,255,255"},{"x":284,"y":788,"pt":"45,196,180,255"}],
+    menuBtn: [{"x":672,"y":76,"pt":"244,248,248,255"},{"x":637,"y":71,"pt":"68,70,65,255"},{"x":659,"y":45,"pt":"77,72,69,255"},{"x":672,"y":29,"pt":"245,245,255,255"}],
+
+  }
+  function checkSth(ctxtar, pts, result, diff=16){
+    // console.log('checking');
+    const pass = pts.every( item => {
+      let myImageData = ctx.getImageData(item.x, item.y, 1, 1).data;
+      const ptarr = item.pt.split(",");
+      return ptarr.every((item2,idx2) => Math.abs(item2 - myImageData[idx2]) <= diff)
+    });
+    if (pass) {
+      console.log(result);
+    }
+  }
+  function play(){
+    document.querySelector('#main-video').play();
+  }
+  function stop(){
+    document.querySelector('#main-video').pause();
+  }
   function clear(){
     console.log('clear');
     px=[];
@@ -79,11 +104,24 @@
     }
   }
   
+  
   function renderCanvas () {
     $canva =$('#canva');
     $video = $("#main-video");
     ctx = $canva[0].getContext('2d');
+    let intervalOn = false;
     console.log($video.width(),$video.height())
+
+    function render () {
+      ctx.drawImage($video[0], 0, 0, $video.width(), $video.height());
+      checkSth(ctx, pointList.okBtn, 'ok found');
+      checkSth(ctx, pointList.menuBtn, 'menu found');
+      if(px.length){
+        updatePoint();
+      }
+    }
+
+
     $canva[0].width = $video.width();
     $canva[0].style.width = $video.width();
     $canva[0].height = $video.height();
@@ -99,19 +137,29 @@
     });
     render();
     $('#clearBtn')[0].addEventListener('click', clear);
+    $('#playBtn')[0].addEventListener('click', play);
+    $('#stopBtn')[0].addEventListener('click', stop);
+    $('#getPoints')[0].addEventListener('click', () => {
+      console.log( JSON.stringify(
+        px.map((item, idx) => {
+          let myImageData = ctx.getImageData(px[idx], py[idx], 1, 1);
+          return {
+            x: px[idx],
+            y: py[idx],
+            pt: myImageData.data.join(','),
+          }
+        })
+      ))
+    });
+
     for(let i =1;i<7;i++){
       $(`#colorblock${i}`)[0].addEventListener('click', (e) => remove(i));
     }
     setInter = setInterval(r => {
-      render();
-    }, 60)
+      intervalOn && render();
+    }, 120)
 
-    function render () {
-      ctx.drawImage($video[0], 0, 0, $video.width(), $video.height());
-      if(px.length){
-        updatePoint();
-      }
-    }
+    
     function updatePoint () {
       px.forEach((item, idx) => {
         let myImageData = ctx.getImageData(px[idx], py[idx], 1, 1);
@@ -131,20 +179,24 @@
         updatePoint();
       }
     }
+    $video[0].addEventListener('play', function () {
+      intervalOn = true;
+    });
+
     // 视频播放结束
     $video[0].addEventListener('ended', function () {
-      clearInterval(setInter);
+      intervalOn = false;
     });
 
     // 视频被暂停
     $video[0].addEventListener('pause', function () {
-      clearInterval(setInter);
+      // intervalOn = false;
     });
   }
   $(($)=>{
-    setTimeout(()=>{
+    document.querySelector('#main-video').addEventListener('canplay', () => {
       renderCanvas();
-    }, 1000)
+    }) 
   })
   function revertColor(arr){
     return [255-arr[0], 255-arr[1], 255-arr[2], 255].join(',');
